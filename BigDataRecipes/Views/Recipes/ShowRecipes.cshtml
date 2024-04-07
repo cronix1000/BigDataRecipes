@@ -1,0 +1,17 @@
+﻿@model List<BigDataRecipes.Models.Recipe>
+
+<h2>Recipes</h2>
+
+@if (Model != null && Model.Count > 0)
+{
+    <ul>
+        @foreach (var recipe in Model)
+        {
+            <li>@recipe.name</li>
+        }
+    </ul>
+}
+else
+{
+    <p>No recipes found.</p>
+}

@@ -1,0 +1,31 @@
+﻿@model List<string>
+
+@{
+    ViewBag.Title = "Select Recipe";
+}
+
+
+<div class="content">
+    <div class="card-container">
+        <div class="card align-content-center">
+        </div>
+        <table class="table align-middle mb-0 bg-white text-center">
+            <thead class="bg-light">
+                <tr>
+                <tr>
+                    <th>Recipe Name</th>
+                    <th>Recipe Properties</th>
+                </tr>
+            </thead>
+            <tbody>
+        @foreach (var name in Model)
+        {
+            <tr>
+            <td>@name</td>
+                        <td><a asp-action="Properties" asp-route-name="@name" class="btn btn-sm btn-primary text-decoration-none">View More</a></td>
+                    </tr>
+        }
+        </tbody>
+        </table>
+        </div>
+        </div>

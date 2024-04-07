@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "Select Ingredients";
+}
+<style>
+    #selectedIngredientsDisplay div {
+        padding: 5px;
+        margin: 2px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        display: inline-block;
+    }
+</style>
+<h2>Select Ingredients</h2>
+
+<input type="text" id="ingredientSearch" placeholder="Type to search ingredients..." autocomplete="off" />
+
+<!-- Multi-Select Dropdown -->
+<select id="ingredientsSelect" multiple="multiple" style="width:100%; max-height:200px; overflow:auto;">
+    <!-- Options will be dynamically added here -->
+</select>
+
+<!-- Visible List of Selected Ingredients -->
+<div id="selectedIngredientsDisplay"></div>
+
+<form action="/Recipes/FindRecipes" method="post">
+    <input type="hidden" id="selectedIngredientsInput" name="selectedIngredientsList" />
+    <input type="submit" value="Find Recipes" />
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById('ingredientSearch');
+        const select = document.getElementById('ingredientsSelect');
+        const selectedList = document.getElementById('selectedIngredientsDisplay');
+        const hiddenInput = document.getElementById('selectedIngredientsInput');
+        let ingredientList = [];
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value;
+            if (searchTerm.length < 2) {
+                select.innerHTML = ''; // Clear previous results
+                return; // Exit if not enough characters
+            }
+
+            fetch(`/Recipes/IngredientsByString?name=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    select.innerHTML = ''; // Clear previous results
+                    data.forEach(ingredient => {
+                        let option = new Option(ingredient, ingredient);
+                        select.add(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Unable to load ingredients.', error);
+                    select.innerHTML = ''; // Ensure dropdown is cleared if there's an error
+                });
+        });
+
+        select.addEventListener('change', function () {
+            // Convert selected options to an array of values
+            let selectedValues = Array.from(this.selectedOptions).map(option => option.value);
+
+            // Accumulate unique selected values without clearing previous selections
+            selectedValues.forEach(value => {
+                if (!ingredientList.includes(value)) {
+                    ingredientList.push(value); // Add new value if not already present
+                }
+            });
+
+            // Clear previously displayed selections to redraw the list
+            selectedList.innerHTML = '';
+
+            // Update visible list with all accumulated ingredients
+            ingredientList.forEach(value => {
+                let div = document.createElement('div');
+                div.textContent = value; // Display ingredient
+                selectedList.appendChild(div);
+            });
+
+            hiddenInput.value = ingredientList.join(',');
+        });
+
+
+    });
+</script>
